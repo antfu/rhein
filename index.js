@@ -9,6 +9,8 @@ const OPTIONS_COMMON = {
     Tab: (cm) => cm.execCommand('indentMore'),
     'Shift-Tab': (cm) => cm.execCommand('indentLess'),
     Enter: onEnterPressed,
+    Backspace: onBackspacePressed('backspace'),
+    Delete: onBackspacePressed('delete'),
   },
 }
 const FONT_HEIGHT = 12
@@ -23,8 +25,30 @@ const START_CURSOR = JSON.parse(
 )
 
 const load = () => localStorage.getItem(STORE_TEXT) || DEFAULT
-const save = (value) => localStorage.setItem(STORE_TEXT, value)
+const save = (value) =>
+  localStorage.setItem(
+    STORE_TEXT,
+    value
+      .trimEnd()
+      .split(EOL)
+      .map((i) => i.trimEnd())
+      .join(EOL)
+  )
 
+const cm = CodeMirror(document.getElementById('editor'), {
+  ...OPTIONS_COMMON,
+  value: fill(load()),
+})
+const updateFillNow = () => {
+  set(cm, fill(cm.getValue()))
+}
+const updateFill = throttle(updateFillNow)
+
+function set(cm, v) {
+  const selections = cm.listSelections()
+  cm.setValue(v)
+  cm.setSelections(selections)
+}
 function onEnterPressed(cm) {
   const { line, ch } = cm.getCursor()
   const text = cm.getRange({ line, ch: 0 }, { line, ch })
@@ -37,14 +61,52 @@ function onEnterPressed(cm) {
         targetCh = i + 2
         break
       }
-    }
-    else {
+    } else {
       space = 0
     }
   }
   cm.setCursor({ line: line + 1, ch: targetCh })
 }
+function isSamePos(a, b) {
+  return a.line === b.line && a.ch === b.ch
+}
+function sortedSelection({ anchor, head }) {
+  if (anchor.line === head.line) {
+    if (anchor.ch < head.ch) return { anchor: head, head: anchor }
+  } else {
+    if (anchor.line < head.line) return { anchor: head, head: anchor }
+  }
+  return { anchor, head }
+}
+function onBackspacePressed(type) {
+  return (cm, a) => {
+    const selections = cm.listSelections()
+    for (const selection of selections) {
+      const { anchor, head } = sortedSelection(selection)
+      if (isSamePos(anchor, head)) {
+        const { line, ch } = anchor
+        cm.replaceRange(
+          SPACE,
+          { line, ch: ch + (type === 'delete' ? 1 : -1) },
+          anchor
+        )
+        cm.setCursor({ line, ch: ch + (type === 'delete' ? 0 : -1) })
+      } else {
+        let space = ''
+        if (anchor.line === head.line)
+          space = new Array(anchor.ch - head.ch).fill(SPACE).join('')
+        else
+          space =
+            new Array(anchor.line - head.line + 1).fill('').join(EOL) +
+            new Array(anchor.ch).fill(SPACE).join('')
 
+        cm.replaceRange(space, head, anchor)
+        cm.setCursor(head)
+        updateFillNow()
+      }
+    }
+  }
+}
 function throttle(func, delay = 1000) {
   let timer
   return () => {
@@ -73,16 +135,6 @@ function fill(text) {
   return result.join(EOL)
 }
 
-const cm = CodeMirror(document.getElementById('editor'), {
-  ...OPTIONS_COMMON,
-  value: fill(load()),
-})
-const updateFill = throttle(() => {
-  const selections = cm.listSelections()
-  cm.setValue(fill(cm.getValue()))
-  cm.setSelections(selections)
-})
-
 cm.setSize('100%', '100%')
 cm.toggleOverwrite(true)
 
@@ -91,15 +143,7 @@ cm.on('change', (_, { origin }) => {
     return
   }
 
-  save(
-    cm
-      .getValue()
-      .trimEnd()
-      .split(EOL)
-      .map((i) => i.trimEnd())
-      .join(EOL)
-  )
-
+  save(cm.getValue())
   updateFill()
 })
 
