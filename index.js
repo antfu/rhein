@@ -84,6 +84,7 @@ const updateFill = throttle(() => {
 })
 
 cm.setSize('100%', '100%')
+cm.toggleOverwrite(true)
 
 cm.on('change', (_, { origin }) => {
   if (origin === 'setValue') {
