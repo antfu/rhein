@@ -1,0 +1,18 @@
+html, body {
+  height: 100%;
+  padding: 0;
+  margin: 0;
+}
+
+html {
+  filter: saturate(0);
+  background: white;
+}
+
+#editor{
+  height: 100%;
+}
+
+.Codemirror {
+  font-family: 'Fira Code', 'Input Mono', monospace;
+}
