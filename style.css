@@ -1,3 +1,8 @@
+:root {
+  --config-font: 'Fira Code Retina', 'Input Mono';
+  --config-size: 14px;
+}
+
 html, body {
   height: 100%;
   padding: 0;
@@ -9,10 +14,19 @@ html {
   background: white;
 }
 
+html, .CodeMirror {
+  font-family: var(--config-font), monospace;
+  font-size: var(--config-size);
+}
+
 #editor{
   height: 100%;
 }
 
-.Codemirror {
-  font-family: 'Fira Code', 'Input Mono', monospace;
+/* Dark */
+html.dark {
+  background: black;
 }
+.dark #editor > .CodeMirror {
+  filter: invert(1);
+} 

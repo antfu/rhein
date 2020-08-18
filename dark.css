@@ -1,8 +1,0 @@
-html {
-  background: black;
-}
-
-#editor > .CodeMirror,
-#debug > .CodeMirror {
-  filter: invert(1);
-} 
