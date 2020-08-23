@@ -6,6 +6,7 @@ const OPTIONS_COMMON = {
   lineSeparator: EOL,
   indentWithTabs: false,
   scrollbarStyle: null,
+  dragDrop: false,
   extraKeys: CodeMirror.normalizeKeyMap({
     Tab: (cm) => cm.execCommand('indentMore'),
     'Shift-Tab': (cm) => cm.execCommand('indentLess'),
@@ -211,7 +212,8 @@ function updateConfigs() {
 
 cm.setSize('100%', '100%')
 cm.toggleOverwrite(true)
-cm.on('beforeChange', (_, { origin, text, cancel }) => {
+cm.on('beforeChange', (_, event) => {
+  const { origin, text, cancel } = event
   if (origin === 'setValue') {
     return
   } else if (origin === 'paste') {
@@ -225,6 +227,20 @@ cm.on('beforeChange', (_, { origin, text, cancel }) => {
       )
     })
     cm.setCursor({ line, ch })
+  } else if (origin === '+input') {
+    const selections = cm.listSelections()
+    if (selections.length === 1 && isSamePos(selections[0].head, selections[0].anchor)) {
+      return
+    }
+    else {
+      cancel()
+      for (const {head, anchor} of selections)
+      cm.replaceRange(
+        text[0].repeat(Math.abs(head.ch - anchor.ch)),
+        head,
+        anchor,
+      )
+    }
   }
 })
 cm.on('change', (_, { origin }) => {
