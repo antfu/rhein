@@ -35,6 +35,18 @@ r.size 14
 
 <p>
 <samp>
-born from a talk with <a href='https://github.com/octref'>@octref</a>
+born from a cup of coffee with <a href='https://github.com/octref'>@octref</a>
 </samp>
 </p>
+
+<p><samp>-</samp></p>
+
+<details>
+<summary><samp>this project is part of my <a href='https://github.com/antfu-sponsors'>sponsor program</a><samp></summary>
+
+<p align="center">
+  <a href="https://cdn.jsdelivr.net/gh/antfu/static/sponsors.svg">
+    <img src='https://cdn.jsdelivr.net/gh/antfu/static/sponsors.svg'/>
+  </a>
+</p>
+</details>
