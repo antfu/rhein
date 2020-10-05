@@ -11,7 +11,7 @@
 
 <p align='center'>
 <samp>
-<a href='https://antfu.github.io/rhein.'>rhein.</a> is a text editor that hand over the freedom<br>
+<a href='https://rhein.netlify.app/'>rhein.</a> is a text editor that hand over the freedom<br>
 of layouting and organizing back to you.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 </samp>
 </p>
